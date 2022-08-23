@@ -11,6 +11,34 @@ func coinChange(coins []int, amount int) int {
 	dp[0] = 0
 
 	for i := 1; i < len(dp); i++ {
+		dp[i] = amount + 1
+
+		for j := 0; j < len(coins); j++ {
+			if i-coins[j] >= 0 && dp[i-coins[j]] != -1 {
+				dp[i] = min(dp[i], dp[i-coins[j]]+1)
+			}
+			if j == len(coins)-1 && dp[i] == amount+1 {
+				dp[i] = -1
+			}
+		}
+	}
+
+	return dp[amount]
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func coinChange2(coins []int, amount int) int {
+	dp := make([]int, amount+1, amount+1)
+
+	dp[0] = 0
+
+	for i := 1; i < len(dp); i++ {
 		currMin := amount + 1
 		for j := 0; j < len(coins); j++ {
 			if i-coins[j] >= 0 && dp[i-coins[j]] != -1 {
