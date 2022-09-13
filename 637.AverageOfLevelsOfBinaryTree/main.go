@@ -6,10 +6,6 @@ type TreeNode struct {
 	Right *TreeNode
 }
 
-// 3
-// 2 4
-// 2 4 2 4
-
 func averageOfLevels(root *TreeNode) []float64 {
 	answer := []float64{}
 	if root == nil {
