@@ -6,12 +6,12 @@ import (
 )
 
 func main() {
-	//fmt.Println(countSubTrees(7, [][]int{{0, 1}, {0, 2}, {1, 4}, {1, 5}, {2, 3}, {2, 6}}, "abaedcd"))
-	fmt.Println(countSubTrees(4, [][]int{{0, 1}, {1, 2}, {0, 3}}, "bbbb"))
+	fmt.Println(countSubTrees(7, [][]int{{0, 1}, {0, 2}, {1, 4}, {1, 5}, {2, 3}, {2, 6}}, "abaedcd"))
+	//fmt.Println(countSubTrees(4, [][]int{{0, 1}, {1, 2}, {0, 3}}, "bbbb"))
 
 	//fmt.Println(countSubTrees(4, [][]int{{0, 2}, {0, 3}, {1, 2}}, "aeed"))
 	//	fmt.Println(countSubTrees(5, [][]int{{0, 1}, {0, 2}, {1, 3}, {0, 4}}, "aabab"))
-	fmt.Println(countSubTrees(25, [][]int{{4, 0}, {5, 4}, {12, 5}, {3, 12}, {18, 3}, {10, 18}, {8, 5}, {16, 8}, {14, 16}, {13, 16}, {9, 13}, {22, 9}, {2, 5}, {6, 2}, {1, 6}, {11, 1}, {15, 11}, {20, 11}, {7, 20}, {19, 1}, {17, 19}, {23, 19}, {24, 2}, {21, 24}}, "hcheiavadwjctaortvpsflssg"))
+	//fmt.Println(countSubTrees(25, [][]int{{4, 0}, {5, 4}, {12, 5}, {3, 12}, {18, 3}, {10, 18}, {8, 5}, {16, 8}, {14, 16}, {13, 16}, {9, 13}, {22, 9}, {2, 5}, {6, 2}, {1, 6}, {11, 1}, {15, 11}, {20, 11}, {7, 20}, {19, 1}, {17, 19}, {23, 19}, {24, 2}, {21, 24}}, "hcheiavadwjctaortvpsflssg"))
 	//http.ListenAndServe("localhost:8080", nil)
 }
 
@@ -24,7 +24,7 @@ func countSubTrees(n int, edges [][]int, labels string) []int {
 	answer := make([]int, n)
 	//edgesMap := map[int][]int{}
 	edgesMap := map[int]*k{}
-	vertexMap := map[int]int{}
+	vertexMap := map[int]map[string]int{}
 	var node, parent int
 
 	for _, edge := range edges {
@@ -43,6 +43,9 @@ func countSubTrees(n int, edges [][]int, labels string) []int {
 				parentParents: nil,
 			}
 
+			vertexMap[parent] = map[string]int{}
+			vertexMap[parent][string(labels[parent])]++
+
 		} else {
 			if _, ok := edgesMap[edge[1]]; ok {
 				node = edge[0]
@@ -52,13 +55,12 @@ func countSubTrees(n int, edges [][]int, labels string) []int {
 				parent = edge[0]
 			}
 		}
-		fmt.Println(node)
+
 		edgesMap[node] = &k{
 			parent:        parent,
 			parentParents: edgesMap[parent],
 		}
 
-		fmt.Println(edgesMap[node])
 		//edgesMap[node] = make([]int, len(edgesMap[parent])+1)
 		//copy(edgesMap[node], edgesMap[parent])
 		//
@@ -71,19 +73,35 @@ func countSubTrees(n int, edges [][]int, labels string) []int {
 		//fmt.Println(edgesMap)
 		//edgesMap[node] = append(edgesMap[node], edgesMap[parent]...)
 		//
-		vertexMap[node] = 1
+		//vertexMap[node] = 1
+
+		vertexMap[node] = map[string]int{}
+		vertexMap[node][string(labels[node])]++
 
 		parentNode := node
 		for {
 			fmt.Println(node)
 			parentNode = edgesMap[parentNode].parent
 			fmt.Println(parentNode)
-			if labels[parentNode] == labels[node] {
-				vertexMap[parentNode]++
+
+			if _, ok := vertexMap[parentNode]; ok {
+				vertexMap[node] = vertexMap[parentNode]
+				vertexMap[node][string(labels[node])]++
+				break
 			}
+
+			if vertexMap[node] == nil {
+				vertexMap[node] = map[string]int{}
+				vertexMap[node][string(labels[node])]++
+			}
+
+			//if labels[parentNode] == labels[node] {
+			//	vertexMap[parentNode]++
+			//}
 			if edgesMap[parentNode].parentParents == nil {
 				break
 			}
+
 			//node = parentNode
 		}
 
@@ -95,12 +113,11 @@ func countSubTrees(n int, edges [][]int, labels string) []int {
 	}
 
 	fmt.Println(edgesMap)
-
-	for i := 0; i < n; i++ {
+	for i, label := range labels {
 		if i == 0 {
-			answer[i] = vertexMap[i] + 1
+			answer[i] = vertexMap[i][string(label)]
 		} else {
-			answer[i] = vertexMap[i]
+			answer[i] = vertexMap[i][string(label)]
 		}
 
 	}
