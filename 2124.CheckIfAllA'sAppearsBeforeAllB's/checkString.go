@@ -1,9 +1,5 @@
 package main
 
-func main() {
-
-}
-
 func checkString(s string) bool {
 	checkForA := false
 
