@@ -49,30 +49,27 @@ func listToSlice(list *ListNode) []int {
 }
 
 func oddEvenList(head *ListNode) *ListNode {
-	fistHeadOdd, firstHeadEven, headOdd, headEven := new(ListNode), new(ListNode), new(ListNode), new(ListNode)
-	fistHeadOdd = headOdd
-	firstHeadEven = headEven
+	headOdd, headEven, tailOdd, tailEven := new(ListNode), new(ListNode), new(ListNode), new(ListNode)
+	headOdd = tailOdd
+	headEven = tailEven
 	odd := true
 
 	for i := head; i != nil; i = i.Next {
+		tmp := &ListNode{
+			Val:  i.Val,
+			Next: nil,
+		}
 		switch {
 		case odd:
-			headOdd.Next = &ListNode{
-				Val:  i.Val,
-				Next: nil,
-			}
-			headOdd = headOdd.Next
-			odd = false
+			tailOdd.Next = tmp
+			tailOdd = tmp
 		case !odd:
-			headEven.Next = &ListNode{
-				Val:  i.Val,
-				Next: nil,
-			}
-			headEven = headEven.Next
-			odd = true
+			tailEven.Next = tmp
+			tailEven = tmp
 		}
+		odd = !odd
 	}
 
-	headOdd.Next = firstHeadEven.Next
-	return fistHeadOdd.Next
+	tailOdd.Next = headEven.Next
+	return headOdd.Next
 }
