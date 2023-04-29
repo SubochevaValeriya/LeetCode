@@ -35,11 +35,11 @@ func main() {
 
 	for event := range events {
 		for i, queue := range eventsQueue {
-			if len(queue) == 2 {
+			select {
+			case queue <- event:
+			default:
 				log.Println("Message is lost from", i)
-				continue
 			}
-			queue <- event
 		}
 	}
 }
