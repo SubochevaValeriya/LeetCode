@@ -29,7 +29,7 @@ func TestWordBreak(t *testing.T) {
 	for _, cse := range testCases {
 		cse := cse
 		t.Run(cse.Name, func(t *testing.T) {
-			result := WordBreak(cse.InputS, cse.InputDict)
+			result := wordBreak(cse.InputS, cse.InputDict)
 			assert.Equalf(t, cse.Expected, result, "for %d and %d expected %t, got %t", cse.InputS, cse.InputDict, cse.Expected, result)
 		})
 	}

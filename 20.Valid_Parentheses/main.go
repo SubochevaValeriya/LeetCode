@@ -3,12 +3,43 @@ package main
 import "fmt"
 
 func main() {
-	s := "[]()[()()][{}]()"
+	s := "[]()[()()][{{]}]()"
 	fmt.Println(len(s))
 	fmt.Println(isValid(s))
 }
 
 func isValid(s string) bool {
+	m := map[string]string{
+		"(": ")",
+		"[": "]",
+		"{": "}",
+	}
+
+	stack := []string{}
+
+	for _, letter := range s {
+		parentheses := string(letter)
+		if parentheses == "(" || parentheses == "{" || parentheses == "[" {
+			stack = append(stack, parentheses)
+			continue
+		}
+		if len(stack) == 0 {
+			return false
+		}
+		if m[stack[len(stack)-1]] == parentheses {
+			stack = stack[:len(stack)-1]
+		} else {
+			return false
+		}
+	}
+
+	if len(stack) == 0 {
+		return true
+	}
+	return false
+}
+
+func isValidOld(s string) bool {
 
 	//if len(s) < 2 - always false
 
