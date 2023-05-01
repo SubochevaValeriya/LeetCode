@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
+	"net/http"
+	_ "net/http/pprof"
 	"os/signal"
 	"sync"
 	"syscall"
@@ -12,41 +13,55 @@ import (
 )
 
 func main() {
-	ctx, cancelFunc := context.WithCancel(context.Background())
-
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
 
 	go func() {
-		oscall := <-quit
-		log.Printf("system call:%+v", oscall)
-		cancelFunc()
+		http.ListenAndServe(":8080", nil)
 	}()
+	ctx, _ := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 
 	events := make(chan SomeEvent)
 	listeners := []Listener{listener1{}, listener2{}}
 	var wg sync.WaitGroup
 
-	wg.Add(1)
+	//wg.Add(1)
 	go func() {
-		defer wg.Done()
+		//defer wg.Done()
+		tick := time.Tick(time.Second)
 		for {
 			select {
 			case <-ctx.Done():
-				log.Println("Canceling 1")
+				log.Println("Canceling event maker")
+				close(events)
 				return
-			default:
+			case <-tick:
 				events <- SomeEvent{}
-				time.Sleep(1 * time.Second)
 			}
 		}
 	}()
 
 	eventsQueue := make([]chan SomeEvent, len(listeners))
-
 	for i := 0; i < len(listeners); i++ {
 		eventsQueue[i] = make(chan SomeEvent, 2)
 	}
+
+	//wg.Add(1)
+	go func() {
+		//defer wg.Done()
+		for event := range events {
+			for i, queue := range eventsQueue {
+				select {
+				case <-ctx.Done():
+					close(queue)
+					log.Println("Canceling 2")
+					return
+				case queue <- event:
+				default:
+					log.Println("Message is lost from", i)
+				}
+			}
+		}
+		log.Println("Canceling 3")
+	}()
 
 	for i, listener := range listeners {
 		wg.Add(1)
@@ -55,32 +70,18 @@ func main() {
 			for {
 				select {
 				case <-ctx.Done():
-					log.Println("Canceling 2")
+					log.Println("Canceling 3", i)
 					return
-				default:
-					event := <-eventsQueue[i]
+				case event, ok := <-eventsQueue[i]:
+					if !ok {
+						log.Println("closed 3", i)
+						break
+					}
 					listener.Handle(event)
 				}
 			}
 		}(i, listener)
 	}
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		for event := range events {
-			for i, queue := range eventsQueue {
-				select {
-				case <-ctx.Done():
-					log.Println("Canceling 3")
-					return
-				case queue <- event:
-				default:
-					log.Println("Message is lost from", i)
-				}
-			}
-		}
-	}()
 
 	wg.Wait()
 	fmt.Println("Main done")
@@ -97,7 +98,7 @@ type listener1 struct {
 }
 
 func (l listener1) Handle(e SomeEvent) {
-	time.Sleep(2 * time.Second)
+	time.Sleep(5 * time.Second)
 	fmt.Println(time.Now(), "Hello")
 }
 
@@ -105,5 +106,5 @@ type listener2 struct {
 }
 
 func (l listener2) Handle(e SomeEvent) {
-	fmt.Println("World")
+	fmt.Println(time.Now(), "World")
 }
