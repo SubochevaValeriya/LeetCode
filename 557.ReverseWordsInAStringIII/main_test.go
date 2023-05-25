@@ -25,3 +25,21 @@ func TestLeetCode(t *testing.T) {
 		})
 	}
 }
+
+func Test_reverseWords(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equalf(t, tt.want, reverseWords(tt.args.s), "reverseWords(%v)", tt.args.s)
+		})
+	}
+}
