@@ -1,18 +1,8 @@
 package main
 
-import (
-	"fmt"
-)
-
 //https://leetcode.com/problems/flip-string-to-monotone-increasing/
 
 func main() {
-	//s := "0101100011"
-	s := "11011"
-	// s := "101010111001010000011101101110"
-	//s := "00110"
-	//s := "10011111110010111011"
-	fmt.Println(minFlipsMonoIncr(s))
 
 }
 
