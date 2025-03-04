@@ -15,6 +15,8 @@ func TestWordBreak(t *testing.T) {
 	testCases := []TestCase{
 		{Name: "case with [1,0,2]", ratings: []int{1, 0, 2}, Expected: 5},
 		{Name: "case with [1,2,2]", ratings: []int{1, 2, 2}, Expected: 4},
+		{Name: "case with [1,6,10,8,7,3,2]", ratings: []int{1, 6, 10, 8, 7, 3, 2}, Expected: 18},
+		{Name: "case with [1,3,4,5,2]", ratings: []int{1, 3, 4, 5, 2}, Expected: 11},
 	}
 
 	for _, cse := range testCases {
@@ -25,3 +27,31 @@ func TestWordBreak(t *testing.T) {
 		})
 	}
 }
+
+//0 0 1 1 1 1 0
+//0 1 1 0 0 0 0
+//
+//1 2 2 2 2 2 1
+//1 2 5 4 3 2 1
+//
+//1 6 10 8
+//
+//1 2 2 1
+//
+//
+//
+//1 2 3 2
+//
+//8 4 6
+//
+//7
+//0 1 2 1 1 1 0
+//
+//1 2 4 3 2 2 1
+//
+//
+//1 6 2 1
+//
+//1 3 2
+//
+//1 2 2
